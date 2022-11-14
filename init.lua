@@ -51,9 +51,22 @@ local opts = {
 }
 require('rust-tools').setup(opts)
 
-local lsp = require'lspconfig'
+local lsp = require('lspconfig')
+
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+lsp.clangd.setup {
+  capabilities = capabilities,
+}
+lsp.tsserver.setup{}
 lsp.pylsp.setup{on_attach=custom_attach}
-lsp.clangd.setup{}
+lsp.volar.setup{
+    init_options = {
+        typescript = {
+            tsdk = '/usr/local/lib/node_modules/typescript/lib'
+        }
+    }
+}
 local cmp = require'cmp'
 cmp.setup({
     snippet = {
@@ -149,10 +162,17 @@ vim.api.nvim_create_autocmd({ "tabnew" }, { callback = shift_tabs_left })
 
 local wk = require("which-key")
 wk.register({
+    g = {
+        d = { "vim.lsp.buf.definition", "Go to definition" },
+        i = { "vim.lsp.buf.implementation", "Go to implementation" }
+    },
     f = {
         f = { "<cmd>Telescope find_files<CR>", "Find File" },
     },
 }, { noremap = true })
+wk.register({
+    g = { "vim.lsp.buf.definition()", "Go to definition" },
+}, { noremap = true , silent = true, buffer = bufnr, prefix = "<leader>"})
 wk.register({
     t = { "<cmd>NvimTreeFindFileToggle<CR>", "Open File Tree" },
     q = { "<cmd>BufferClose<CR>", "Close tab" },

@@ -6,8 +6,10 @@ vim.o.smarttab = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.expandtab = true
+vim.o.autoindent = true
 vim.o.smartindent = true
-vim.o.tabstop = 4
+
+
 vim.o.shiftwidth = 4
 
 vim.cmd("colorscheme kanagawa")
@@ -20,6 +22,7 @@ require('lualine').setup {
 require('mason').setup()
 require('telescope').setup()
 require('nvim-autopairs').setup()
+require('nvim_comment').setup()
 require("indent_blankline").setup {
     show_current_context = true,
     show_current_context_start = true,
@@ -54,7 +57,7 @@ require('rust-tools').setup(opts)
 local lsp = require('lspconfig')
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 lsp.clangd.setup {
   capabilities = capabilities,
 }
@@ -142,21 +145,21 @@ require('tmux').setup()
 
 -- Match tab shift to tree width
 local nvim_tree_events = require('nvim-tree.events')
-local bufferline_state = require('bufferline.state')
+local bufferline_api = require('bufferline.api')
 local function get_tree_size()
     return require'nvim-tree.view'.View.width
 end
 nvim_tree_events.subscribe('TreeOpen', function()
-    bufferline_state.set_offset(get_tree_size())
+    bufferline_api.set_offset(get_tree_size())
 end)
 nvim_tree_events.subscribe('Resize', function()
-    bufferline_state.set_offset(get_tree_size())
+    bufferline_api.set_offset(get_tree_size())
 end)
 nvim_tree_events.subscribe('TreeClose', function()
-    bufferline_state.set_offset(0)
+    bufferline_api.set_offset(0)
 end)
 local function shift_tabs_left()
-    bufferline_state.set_offset(0)
+    bufferline_api.set_offset(0)
 end
 vim.api.nvim_create_autocmd({ "tabnew" }, { callback = shift_tabs_left })
 
@@ -164,18 +167,21 @@ local wk = require("which-key")
 wk.register({
     g = {
         d = { "vim.lsp.buf.definition", "Go to definition" },
-        i = { "vim.lsp.buf.implementation", "Go to implementation" }
+        i = { "vim.lsp.buf.implementation", "Go to implementation" },
+        c = { "Comment line, can be followed by count and motion" },
     },
     f = {
         f = { "<cmd>Telescope find_files<CR>", "Find File" },
+        g = { "<cmd>Telescope live_grep<CR>", "Find live grep" },
     },
 }, { noremap = true })
-wk.register({
-    g = { "vim.lsp.buf.definition()", "Go to definition" },
-}, { noremap = true , silent = true, buffer = bufnr, prefix = "<leader>"})
+
 wk.register({
     t = { "<cmd>NvimTreeFindFileToggle<CR>", "Open File Tree" },
     q = { "<cmd>BufferClose<CR>", "Close tab" },
+    x = { "\"_d", "Delete to black hole"},
+    d = { "\"+d", "Delete to clipboard"},
+    y = { "\"+d", "Yank to clipboard"},
     ['1'] = { "<cmd>BufferGoto 1<CR>", "Switch to tab 1" },
     ['2'] = { "<cmd>BufferGoto 2<CR>", "Switch to tab 2" },
     ['3'] = { "<cmd>BufferGoto 3<CR>", "Switch to tab 3" },

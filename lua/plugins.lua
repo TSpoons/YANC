@@ -48,6 +48,8 @@ return require('packer').startup(function()
     -- Parentheses
     use 'windwp/nvim-autopairs'
 
+    -- Comments 
+    use 'terrortylor/nvim-comment'
 -------------------------------------------------------------------------------
 -- Appearance
 

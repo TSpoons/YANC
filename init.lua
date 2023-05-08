@@ -8,8 +8,6 @@ vim.o.smartcase = true
 vim.o.expandtab = true
 vim.o.autoindent = true
 vim.o.smartindent = true
-
-
 vim.o.shiftwidth = 4
 
 vim.cmd("colorscheme kanagawa")
@@ -59,9 +57,19 @@ local lsp = require('lspconfig')
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 lsp.clangd.setup {
-  capabilities = capabilities,
+    capabilities = capabilities,
 }
 lsp.tsserver.setup{}
+lsp.yamlls.setup{
+    settings = {
+        yaml = {
+            schemas = {
+                openapi = "globPattern"
+            },
+        }
+    }
+}
+lsp.angularls.setup{}
 lsp.pylsp.setup{on_attach=custom_attach}
 lsp.volar.setup{
     init_options = {
@@ -179,9 +187,8 @@ wk.register({
 wk.register({
     t = { "<cmd>NvimTreeFindFileToggle<CR>", "Open File Tree" },
     q = { "<cmd>BufferClose<CR>", "Close tab" },
-    x = { "\"_d", "Delete to black hole"},
-    d = { "\"+d", "Delete to clipboard"},
-    y = { "\"+d", "Yank to clipboard"},
+    d = { "\"_", "Point to black hole register"},
+    y = { '"+y', "Point to clipboard register"},
     ['1'] = { "<cmd>BufferGoto 1<CR>", "Switch to tab 1" },
     ['2'] = { "<cmd>BufferGoto 2<CR>", "Switch to tab 2" },
     ['3'] = { "<cmd>BufferGoto 3<CR>", "Switch to tab 3" },
